@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './Register.css'; // Only register styles
+import { registerUser } from "../api/api";
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -66,3 +67,4 @@ const Register = () => {
 };
 
 export default Register;
+
