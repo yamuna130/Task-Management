@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css'; // Just for form styles (no background image)
+import { loginUser, registerUser } from "../api/api";
+import { getTasks } from "../api/api";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -64,3 +66,4 @@ const Login = () => {
 };
 
 export default Login;
+
