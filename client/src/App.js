@@ -5,19 +5,45 @@ import Register from './pages/Register';
 import Tasks from './pages/Tasks';
 import ThemeToggle from './components/ThemeToggle';
 
-const App = () => {
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" replace />;
+};
+
+function App() {
   return (
-    <BrowserRouter>
-      <div style={{ padding: '1rem' }}>
-        <ThemeToggle />
+    <Router>
+      <div style={{ padding: 16 }}>
+        <nav style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+          <Link to="/">Home</Link>
+          <Link to="/register">Register</Link>
+          <Link to="/login">Login</Link>
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/login";
+            }}
+          >
+            Logout
+          </button>
+          <ThemeToggle />
+        </nav>
+
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Tasks />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/register" element={<Register />} />
-          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </div>
-    </BrowserRouter>
+    </Router>
   );
-};
+}
 
 export default App;
