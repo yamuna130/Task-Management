@@ -1,52 +1,47 @@
+// client/src/api/api.js
 import axios from "axios";
 
-// Base URL from environment variable
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: process.env.REACT_APP_API_URL, // e.g. https://task-management-hhnu.onrender.com
 });
 
-// --- TASK API CALLS ---
+// attach token (if present)
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
-// Get all tasks
+// ===== AUTH =====
+export const registerUser = async (payload) => {
+  const { data } = await API.post("/api/auth/register", payload);
+  return data;
+};
+
+export const loginUser = async (payload) => {
+  const { data } = await API.post("/api/auth/login", payload);
+  // backend should return { token, user } (adjust if different)
+  if (data?.token) localStorage.setItem("token", data.token);
+  return data;
+};
+
+// ===== TASKS =====
 export const getTasks = async () => {
-  try {
-    const response = await API.get("/api/tasks");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching tasks:", error);
-    throw error;
-  }
+  const { data } = await API.get("/api/tasks");
+  return data;
 };
 
-// Create a new task
-export const createTask = async (taskData) => {
-  try {
-    const response = await API.post("/api/tasks", taskData);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating task:", error);
-    throw error;
-  }
+export const createTask = async (task) => {
+  const { data } = await API.post("/api/tasks", task);
+  return data;
 };
 
-// Update a task by ID
-export const updateTask = async (taskId, updatedData) => {
-  try {
-    const response = await API.put(`/api/tasks/${taskId}`, updatedData);
-    return response.data;
-  } catch (error) {
-    console.error("Error updating task:", error);
-    throw error;
-  }
+export const updateTask = async (id, task) => {
+  const { data } = await API.put(`/api/tasks/${id}`, task);
+  return data;
 };
 
-// Delete a task by ID
-export const deleteTask = async (taskId) => {
-  try {
-    const response = await API.delete(`/api/tasks/${taskId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting task:", error);
-    throw error;
-  }
+export const deleteTask = async (id) => {
+  const { data } = await API.delete(`/api/tasks/${id}`);
+  return data;
 };
