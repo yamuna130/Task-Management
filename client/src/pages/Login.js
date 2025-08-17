@@ -1,69 +1,49 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Login.css'; // Just for form styles (no background image)
-import { loginUser, registerUser } from "../api/api";
-import { getTasks } from "../api/api";
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const { data } = await axios.post("https://task-management-backend.onrender.com/api/auth/login", {
+        email,
+        password,
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem('token', data.token);
-      navigate('/tasks');
-    } else {
-      alert(data.error || 'Login failed');
+      // Save token to localStorage
+      localStorage.setItem("token", data.token);
+
+      // ✅ Redirect to tasks/dashboard
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+      alert("Invalid credentials!");
     }
   };
 
   return (
-    <div
-      style={{
-        backgroundImage: "url('/images/login.jpg')", // ✅ this works with image in /public
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <div className="auth-container">
-        <h2>Login</h2>
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-          />
-          <button type="submit">Login</button>
-        </form>
-        <p>
-          Don't have an account? <a href="/register">Register</a>
-        </p>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button type="submit">Login</button>
+    </form>
   );
-};
+}
 
 export default Login;
 
